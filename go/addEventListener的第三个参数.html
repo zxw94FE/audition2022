@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+      .box {
+        position: relative;
+        background-color: coral;
+        border: 1px solid;
+        padding: 50px;
+      }
+      .child {
+        position: relative;
+        background-color: pink;
+        width: 100px;
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <p>该实例演示了在添加事件监听时冒泡与捕获阶段的不同。</p>
+    <div id="myDiv" class="box">
+      <div id="myP" class="child">点击该方块， 我是冒泡</div>
+    </div>
+    <script>
+      document.getElementById('myDiv').addEventListener(
+        'click',
+        function (e) {
+          alert("橙色")
+          console.log(e.target, e.currentTarget)
+        },
+        false
+      )
+      document.getElementById('myP').addEventListener(
+          'click',
+          (e) => {
+              alert("粉色")
+            console.log("粉色", e.target, e.currentTarget,1); 
+          },
+          true
+      )
+
+
+
+      /**
+       * addEventListener第三个参数：指定事件在什么阶段执行 false默认 冒泡  true 捕获
+       * 
+       * 父跟子如果都绑定了事件监听函数，以父元素的第三个参数为准，如果为false，即先触发子元素的事件，如果为true， 即先触发父元素的事件。
+       * e.target 触发事件的元素， 上面都是 粉色 
+       * e.currentTarget 绑定事件的元素 粉色跟橙色都有可能
+    </script>
+  </body>
+</html>

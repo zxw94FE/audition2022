@@ -1,0 +1,42 @@
+<!--
+ * @Author       : zhaixiaowei@xdf.cn
+ * @Date         : 2022-09-16 16:47:25
+ * @LastEditors  : zhaixiaowei@xdf.cn
+ * @LastEditTime : 2022-09-16 17:17:38
+ * @Description  : 描述信息
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  给定数组 [1,2,3,4,5,[6,7,[8,[9]]]] 求出嵌套的层数。
+
+  <script>
+    const arr = [1, 2, 3, 4, 5, [6, 7, [8, [9, [10]]]]]
+    const count = (arr) => {
+      let num = 0
+
+      const flat = (arr) => {
+        const arr2 = arr.flat()
+        if (arr2.some(item => Object.prototype.toString.call(item) === '[object Array]')) {
+          num += 1
+          flat(arr2)
+        }
+      }
+
+      flat(arr)
+      return num
+    }
+
+    console.log(count(arr));
+  </script>
+</body>
+
+</html>

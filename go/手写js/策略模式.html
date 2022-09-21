@@ -1,0 +1,127 @@
+<!--
+ * @Author       : zhaixiaowei@xdf.cn
+ * @Date         : 2022-09-09 11:46:09
+ * @LastEditors  : zhaixiaowei@xdf.cn
+ * @LastEditTime : 2022-09-09 16:51:32
+ * @Description  : 描述信息
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>策略模式</title>
+</head>
+<body>
+    <form action="/" class="form">
+      <input type="text" name="username">
+      <input type="password" name="password"> 
+      <button>submit</button>
+    </form>
+    <div id="tip"></div>
+    <a href="https://segmentfault.com/a/1190000021883055">原文链接 - 深入浅出js中的策略模式</a>
+</body>
+<script>
+    /*
+        使用策略模式验证表单
+        常见表单验证用if、else流程语句判断用户输入数据是否符合验证规则，
+        而在Elementui中，基于async-validator库，只需要通过rule属性传入约定的验证规则，即可校验。方便快捷，可复用。
+        现在我们根据策略模式仿写一个校验方式。
+    */
+    const strategies = {
+      // 非空
+      noEmpty: function(value, errMsg){
+        if(value === ''){
+          return errMsg
+        }
+      },
+      // 最小长度
+      minLength: function(value, length, errMsg){
+        if(!value || value.length < length){
+          return errMsg
+        }
+      },
+      // 最大长度
+      maxLength: function(value, length, errMsg){
+        if(value.length > length){
+          return errMsg
+        }
+      }
+    }
+
+    // 创建验证器
+    var Validator = function(strategies){
+      this.strategies = strategies
+      this.cache = [] // 存储校验规则
+    }
+    // 添加校验规则
+    Validator.prototype.add = function(dom, rules){
+      rules.forEach(item => {
+        this.cache.push(() => {
+          let value = dom.value
+          let arr = item.rule.split(':')
+          let name = arr.shift()
+          let params = [value, ...arr, item.errMsg]
+          // apply保证上下文一致 这块有争议 
+          // return this.strategies[name](...params) 这样写也没问题。
+          return this.strategies[name].apply(dom, params)
+        })
+      })
+    }
+    // 校验结果
+    Validator.prototype.validate = function(dom, rules, errMsg){
+      // 遍历cache里面的校验函数
+      for(let i = 0, validateFun; validateFun = this.cache[i++];){
+        const message = validateFun()
+        // 返回报错信息，终止验证并抛出异常
+        if(message) return message
+      }
+    }
+
+    var form = document.querySelector("form")
+    // 提交表单
+    form.onsubmit = function(event){
+      event.preventDefault() 
+      // 判断验证结果
+      const message = validate()
+      const tip = document.getElementById('tip')
+      if(message){
+        tip.innerHTML = message
+        tip.style.color = 'red'
+      }else{
+        tip.innerHTML = '验证通过！'
+        tip.style.color = 'green'
+      }
+    }
+    // 校验函数
+    function validate(){
+      // 实例验证器
+      const validator = new Validator(strategies)
+      // 添加验证规则
+      validator.add(form.username, [
+        {
+          rule: 'noEmpty',
+          errMsg: '用户名不能为空!'
+        },
+        {
+          rule: 'minLength:3',
+          errMsg: '用户名长度大于3!'
+        }
+      ])
+      validator.add(form.password, [
+        {
+          rule: 'minLength:6',
+          errMsg: '密码长度大于6!'
+        },
+        {
+          rule: 'maxLength:10',
+          errMsg: '密码最大长度为10!'
+        }
+      ])
+      // 进行校验，并返回结果
+      return validator.validate()
+    }
+
+</script>
+</html>

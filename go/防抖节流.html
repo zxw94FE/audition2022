@@ -1,0 +1,123 @@
+<!--
+ * @Author       : zhaixiaowei@xdf.cn
+ * @Date         : 2022-08-08 17:51:04
+ * @LastEditors  : zhaixiaowei@xdf.cn
+ * @LastEditTime : 2022-08-08 18:28:57
+ * @Description  : 描述信息
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="button">123</div>
+    <script>
+        const _debounce = (fn, delay) => {
+            let timer;
+            let flag = true;
+            return (...args) => {
+                const _this = this
+                timer && clearTimeout(timer)
+                if(flag) {
+                    fn.apply(_this, args)
+                    flag = false
+                }
+                timer = setTimeout(() => {
+                    fn.apply(_this, args)
+                    flag = true
+                }, delay)
+            }
+        }
+        
+        // 节流 立即执行版
+        function throttle(fn, delay) {
+            let flag = true
+            return (...args) => {
+                const _this = this
+                if(flag) {
+                    fn.apply(_this, args)
+                    flag = false
+                    setTimeout(() => {
+                        flag = true
+                    }, delay)
+                }
+            }
+        }
+
+        // 节流 非立即执行版
+        function throttle2(fn, delay) {
+            let flag = true
+            return (...args) => {
+                const _this = this
+                if(flag) {
+                    flag = false
+                    setTimeout(() => {
+                        fn.apply(_this, args)
+                        flag = true
+                    }, delay)
+                }
+            }
+        }
+// 节流 立即执行版跟 非立即执行的结合版
+function throttle3 (fn, delay, immediate) {
+    let timer;
+    let flag = true
+    return (...args) => {
+        const _this = this
+        if(immediate) {
+            if (flag) {
+                fn.apply(_this, args)
+                flag = false
+                setTimeout(() => {
+                    flag = true
+                }, delay)
+            }
+        } else {
+           if(timer) return
+           timer = setTimeout(() => {
+               fn.apply(_this, args)
+               timer = null
+           }, delay) 
+        }
+        
+    }
+}
+
+// 防抖：立即执行与非立即执行 结合版本
+function debounce (fn, delay = 500, immediate = false) {
+    let timer;
+    let flag = true;
+    return (...args) => {
+        const _this = this
+        timer && clearTimeout(timer)
+        if (immediate) {
+            if (flag) {
+                fn.apply(_this, args)
+                flag = false
+            }
+            timer = setTimeout(() => {
+                fn.apply(_this, args)
+                flag = true
+            }, delay)
+        } else {
+            timer = setTimeout(() => {
+                fn.apply(_this, args)
+            }, delay)
+        }
+    }
+}
+
+
+        const log = () => {
+            console.log(123);
+        }
+
+        document.getElementById('button').addEventListener('click', debounce(log, 1000, false))
+        // document.getElementById('button').addEventListener('click', throttle3(log, 1000, true))
+    </script>
+</body>
+</html>

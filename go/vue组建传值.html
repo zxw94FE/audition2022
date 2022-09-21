@@ -1,0 +1,34 @@
+<!--
+ * @Author       : zhaixiaowei@xdf.cn
+ * @Date         : 2022-07-21 10:29:26
+ * @LastEditors  : zhaixiaowei@xdf.cn
+ * @LastEditTime : 2022-08-05 10:34:24
+ * @Description  : 描述信息
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    1. props $emit 
+    2. eventBus 事件总线 ($emit, $on) - 复杂项目中很难维护 
+    3.
+    依赖注入 provide inject - 依赖注入提供的属性是非响应式的 
+    4. ref
+    属性在子组件上 它的引用就指向了子组件的实例，通过实例访问组件的数据跟方法 -
+    this.$refs 
+    5. $parent $children - $parent
+    获取到的是一个对象，访问父组件的实例 - 可以通过$root获取到根组件的实例 -
+    $children 获取到的是一个无序数组 不能保证顺序，并且访问的数据也不是响应式的
+    6. $attrs / listeners 广义 祖孙之间的传递 $attrs
+    继承所有的父组件属性(除了props传递的属性、class、style)
+    一般用在子组件的子元素上。 $listeners
+    该属性是一个对象，包含了作用在此组件上的所有监听器，可以配合v-on="$listeners"
+    将所有的事件监听器指向这个组件的某个特定的子元素、
+    相当于子组件继承父组件的事件。
+  </body>
+</html>

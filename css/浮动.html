@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .box {
+            width: 500px;
+            height: 500px;
+            background-color: #bfc;
+        }
+        .left, .right {
+            width: 100px;
+            height: 200px;
+        }
+        .left {
+            float: left;
+            background-color: red;
+        }
+        .right {
+            float: right;
+            background-color: gold;
+        }
+        .top {
+            width: 100px;
+            height: 500px;
+            background-color: aqua;
+        }
+        .middle {
+            float: left;
+            width: 500px;
+            height: 100px;
+            background-color: black;
+        }
+        span {
+            display: inline-block;
+        }
+        .footer {
+            width: 100px;
+            height: 200px;
+            background-color: blue;
+        }
+    </style>
+</head>
+<!--
+    TODO 关于浮动的知识点
+        1. 如果有多个浮动元素，浮动元素会按照顺序排下来而不会出现重叠的现象
+        2. 浮动元素会尽可能的向顶端，左右对齐
+        3. 如果有浮动元素与非浮动元素同时存在，如果非浮动元素在前，浮动元素则不会覆盖非浮动元素
+            3.1 但是如果浮动元素在前，那么就会产生覆盖
+        4. 浮动元素无法覆盖不浮动的行内元素或者不浮动的行内块元素
+            4.1 浮动没法覆盖文字，哪怕是块元素（元素还是会被覆盖，但是字不会覆盖, 如果被覆盖的没空间了，字就被挤出去。很神奇）
+-->
+<body>
+    <div class="box">
+<!--        <div class="top"></div>-->
+
+        <div class="left"></div>
+        <div class="footer">121212</div>
+        <div class="right"></div>
+        <div class="middle"></div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!--
+ * @Author       : zhaixiaowei@xdf.cn
+ * @Date         : 2022-05-10 11:14:34
+ * @LastEditors  : zhaixiaowei@xdf.cn
+ * @LastEditTime : 2022-05-11 14:28:04
+ * @Description  : 描述信息
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>优雅的处理自动播放被禁止</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      .vidbox {
+        position: relative;
+      }
+
+      #video {
+        border: 2px solid black;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      #playbutton {
+        width: 0;
+        height: 50px;
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        border: 0;
+        background-color: transparent;
+        filter: opacity(60%);
+        border-color: transparent transparent transparent #222;
+        cursor: pointer;
+        border-style: solid;
+        border-width: 25px 0 25px 40px;
+      }
+
+      #playbutton.playing {
+        border-style: double;
+        border-width: 0 0 0 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="vidbox">
+      <video
+        id="video"
+        width="480"
+        src="https://webrtc.github.io/samples/src/video/chrome.mp4"
+      ></video>
+      <button id="playbutton"></button>
+    </div>
+  </body>
+  <script>
+    let videoElem = document.getElementById('video')
+    let playButton = document.getElementById('playbutton')
+
+    playButton.addEventListener('click', handlePlayButton, false)
+    playVideo()
+
+    async function playVideo() {
+      try {
+        await videoElem.play()
+        playButton.classList.add('playing')
+      } catch (err) {
+        playButton.classList.remove('playing')
+      }
+    }
+
+    function handlePlayButton() {
+      if (videoElem.paused) {
+        playVideo()
+      } else {
+        videoElem.pause()
+        playButton.classList.remove('playing')
+      }
+    }
+    /*
+      在这个例子中，视频的播放由 async playVideo() 函数控制。
+      函数尝试播放视频，如果播放成功，将 playButton 元素的类名称设为 "playing"。
+      如果播放失败，去除 playButton 元素的类名称，恢复其原来的样式。
+      通过监视 play() 返回的 Promise 是被解决还是被拒绝以保证播放按钮的外观与实际的播放状态相匹配。
+
+      上述代码开始执行时，
+      先获取 <video> 元素和用于切换播放、暂停的 <button> 元素的引用。
+        在切换按钮上添加 click (en-US) 事件的处理程序。
+        最后调用 playVideo() 尝试自动开始播放。
+    */
+
+    /*
+        首先强烈建议看一下这个文档 ： https://developer.chrome.com/blog/play-request-was-interrupted/
+    */
+    /**
+     * 浏览器的自动播放策略：
+     * 据新政策，媒体内容将在满足以下至少一个的条件下自动播放：
+          音频被静音或其音量设置为0
+          用户和网页已有交互行为（包括点击、触摸、按下某个键等等）
+          网站已被列入白名单；如果浏览器确定用户经常与媒体互动，这可能会自动发生，也可能通过首选项或其他用户界面功能手动发生
+          自动播放策略应用到<iframe>或者其文档上
+     */
+
+    /*
+      既然我们已经介绍了什么是自动播放以及什么可以阻止自动播放，
+      接下来我们将介绍您的网站或应用程序如何在页面加载时自动播放媒体，如何检测何时自动播放失败，以及当自动播放被浏览器拒绝时的应对技巧。
+
+      🌰  1： autoplay属性：
+            <audio id="musicplayer" autoplay>
+              <source src="/music/chapter1.mp4">
+            </audio>
+      满足以下条件媒体元素尽快自动开始播放
+        页面允许使用自动播放功能
+        媒体元素已在页面加载期间创建
+        假设网络性能或带宽没有显着变化，且已收到足够的媒体流并已开始播放，继续播放直至媒体结束而不会中断。
+
+      🌰：2： 检测自动播放失败。
+            自动播放失败时不会触发任何事件， 也没有抛出异常或可以设置回调，
+            甚至在媒体元素上都没有标记来告诉你自动播放是否起作用。
+            你实际能做的就是检查一些值，然后根据这些值猜测自动播放是否起作用。
+
+        play事件：当媒体在暂停后恢复时以及发生自动播放时都会发送该事件。这意味着第一次play触发事件时，您知道您的媒体是在页面打开后第一次启动。
+        <video src="myvideo.mp4" autoplay onplay=handleFirstPlay(event)">
+        function handleFirstPlay(event) {
+          let vid = event.target;
+
+          vid.onplay = null;
+
+          // Start whatever you need to do after playback has started
+        }
+
+        从Event对象的中获得对视频元素的引用后target，
+        该元素的onplay处理程序设置为null。
+        这将防止任何未来的play事件被传递给处理程序。
+        如果视频被用户暂停和恢复，或者当文档位于背景选项卡中时由浏览器自动暂停和恢复，则可能会发生这种情况。
+
+        * 此时，您的网站或应用程序可以开始任何需要执行的操作，这取决于已启动的视频。
+        注意：这种方法不区分自动播放和用户手动开始播放。
+
+        🌰 3：play() 方法 建议多使用这个方法来自动播放，因为自动播放的限制更少，同时能让浏览器优化播放的时间。
+        document.querySelector("video").play();
+
+        处理play() 的失败
+        play()返回 a Promise，一旦媒体成功开始播放，它就会被解析，并在播放无法开始时被拒绝（例如，如果自动播放被拒绝）。
+        当自动播放失败时，您可能希望提供一种方法让用户手动告诉浏览器要求用户授予播放媒体的权限。
+
+        let startPlayPromise = videoElem.play();
+
+        if (startPlayPromise !== undefined) {
+          startPlayPromise.catch(error => {
+            if (error.name === "NotAllowedError") {
+              showPlayButton(videoElem);
+            } else {
+              // Handle a load or playback error
+            }
+          }).then(() => {
+            // Start whatever you need to do only after playback
+            // has begun.
+          });
+        }
+
+        我们对结果做的第一件事play()是确保它不是undefined. 我们检查这一点是因为在早期版本的 HTML 规范中，play()没有返回值。最近添加了返回承诺以允许您确定操作的成功或失败。检查undefined可防止此代码在旧版本的 Web 浏览器上因错误而失败。
+
+        然后我们向 Promise 添加一个catch()处理程序。这会查看错误的name (en-US)以查看它是否是NotAllowedError. 这表示由于权限问题（例如自动播放被拒绝）而导致播放失败。如果是这种情况，我们应该提供一个用户界面让用户手动开始播放；这是由一个函数在这里处理的showPlayButton()。
+
+        任何其他错误都将酌情处理。
+
+        如果返回的 promiseplay()没有错误地解决，则该then()子句运行并且可以在自动播放开始时开始任何需要做的事情。
+
+        🌰 4: 静音播放：<video src="/videos/awesomevid.webm" controls autoplay muted>
+
+        🌰 5 ： 浏览器配置选项
+        浏览器可能具有控制自动播放工作方式或处理自动播放阻止方式的首选项 https://developer.mozilla.org/zh-CN/docs/Web/Media/Autoplay_guide#handling_autoplay_failure_with_media_controls
+     */
+
+    /*
+        使用web Audio API自动播放
+
+        仅允许从文档的域自动播放 <iframe src="mediaplayer.html" allow="autoplay 'src'"></iframe>
+        允许自动播放和全屏模式 <iframe src="mediaplayer.html" allow="autoplay 'src'; fullscreen"></iframe>
+        允许从特定来源自动播放 <iframe width="300" height="200" src="mediaplayer.html" allow="autoplay 'src' https://example.media"></iframe>
+        禁用自动播放 <iframe src="mediaplayer.html" allow="autoplay 'none'"></iframe>
+      */
+
+      /**
+       * 最佳做法：
+  </script>
+</html>

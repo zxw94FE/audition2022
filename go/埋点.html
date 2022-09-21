@@ -1,0 +1,154 @@
+<!--
+ * @Author       : zhaixiaowei@xdf.cn
+ * @Date         : 2022-08-04 16:53:21
+ * @LastEditors  : zhaixiaowei@xdf.cn
+ * @LastEditTime : 2022-08-05 11:04:06
+ * @Description  : 描述信息
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    新东方使用过的用户行为分析工具有：
+        sentry
+        growingIo 
+        听云
+        小程序后台分析工具
+
+    1. pv - pageView 网页浏览量/点击量 说白了就是统计某些页面在一段时间内被访问了多少次
+    2. uv - Unique Visitor 独立访客 统计一天内访问某站点的用户数（以cookie为依据）
+        访问网站的一台电脑客户端为一个访客，可以理解为访问某网站的电脑的数量。
+    3. ip - internet Protocol 独立ip数。是指一天内多少个独立的ip浏览了页面。 
+
+    三者的统计都会有误差，误差在哪里？ 
+        例如统计PV的时候，来源不明的水军可能会利用脚本不断的重复访问某个网页，使得PV数不正常激增，此时PV > 真实数据。
+        统计UV的时候，如果有个用户不断清除cookie或者换了很多台设备来访问的话，那么这个用户会被统计多次，此时 UV > 真实数据。 如果多个使用者共用一个账号和同一个设备的时候，此时UV < 真实数据。
+        统计IP的时候，如果用户切换了手机的网络模式（4g -> wifi）此时IP > 真实数据，多个使用者共用同一个设备的时候，此时IP < 真实数据。
+        也就是误差总是存在的，在数据量较多，统计周期较长并明显存在某些规律的情况下，其实这些误差也是可以忽略的。
+
+
+    埋点的触发时机 触发时机
+    其实无论是PV、UV的统计（IP的统计一般后端可以独立完成，不需要前端的参与），还是埋点技术，说穿了就是要在合适的时机向后端发送一个合适的请求。
+    什么时机才算是合适的时机呢？这也要具体情况具体分析，比如，PV量统计一般是在路由跳转监听中进行，我们可以在一个全局性的路由钩子中实现。而UV的统计则依赖后端多一些，前端只需要把种好的cookie信息再携带到任意请求的请求体中即可，后端来进行过滤筛选。
+    埋点技术场景则复杂一些，比如在某些按钮的点击操作中，滚动条的监听事件处理程序中等等。
+    
+    
+    如何发送请求
+    PV、UV以及埋点中请求的时机各有不同，发送请求的方式其实也会有选择的空间。
+    常见的请求的方式例如使用ajax或者fetch来发送GET/POST请求当然可以解决需要，
+    但是这样的方式往往消耗比较大，相应速度也会较慢，好处在于传输到后端的数据可以携带的稍微多一些，请求回来的数据一般都是JSON格式的数据，处理起来也很方便。
+    但是用Ajax或者fetch的话，很可能带来跨域的问题，因为有的时候记录埋点数据和PV、UV数据的服务器是与应用服务器分离的。
+    而且其实很多情况下前端在发送此类请求的时候，并不会传递很多信息，往往只是几个简单的query params字段，而且也并不期待服务端的返回信息来使用。
+    所以真正使用场景较多的实现方式是以img请求的方式来进行的。
+    
+    Image Beacon技术
+        上面收到大部分情况下使用img请求的方式是最可行的，那么是为什么呢？具体要怎么实现呢？
+        首先，利用Image Beacon是不会碰到跨域问题的，浏览器的安全级别限制不针对这个。
+        而且请求体的体积较小，请求速度较快，网络资源消耗较少。
+        既然如此，那为什么不选择其他类型文件的请求例如JS文件、CSS文件或者TTF字体类的文件呢？
+        是因为JS等类型的文件必须要插入到文档树中浏览器才会发送请求，很可能带来渲染的成本而且有可能会阻塞文档树的渲染，但是图片请求则不然，构造图片打点不仅不用插入DOM，只要在js中new出Image对象就能发起请求，而且还没有阻塞问题，在没有js的浏览器环境中也能通过img标签正常打点，这是其他类型的资源请求所做不到的。
+        说到这里，还有最后一个选择要做，就是应该使用什么格式的Img呢？
+        首先，1x1像素是最小的合法图片。而且，因为是通过图片打点，所以图片最好是透明的，图片透明只要使用一个二进制位标记图片是透明色即可，不用存储色彩空间数据，可以节约体积。
+        那么BMP、PNG和GIF格式都支持透明格式，我们要选择哪种呢？答案是GIF格式，据统计，最小的BMP文件需要74个字节，PNG需要67个字节，而合法的GIF，只需要43个字节，体积小请求成本当前就会较低。
+        最后总结一下为什么此类请求最佳方案是使用GIF格式的1 * 1尺寸透明图片呢？
+
+            能够完成整个 HTTP 请求+响应（尽管不需要响应内容）
+            触发 GET 请求之后不需要获取和处理数据、服务器也不需要发送数据
+            跨域友好
+            执行过程无阻塞
+            相比 XMLHttpRequest 对象发送 GET 请求，性能上更好
+            GIF的最低合法体积最小（最小的BMP文件需要74个字节，PNG需要67个字节，而合法的GIF，只需要43个字节）
+</body>
+<script>
+//埋点的技术方案：
+// 1. image beacon
+/**
+ * @module beacon实现模块
+*/
+import Qs from 'querystring'
+
+/**
+ * @function 具体的beacon动作
+ * @param {String} apiUrl 发送的接口请求
+ * @param {Object} params 具体发送的数据
+ * @example beaconAction('/api/recored', { url: '...' }).then((res) => {}).catch((error) => {})
+ */
+export const beaconAction = (apiUrl, params) => {
+  /** 如果参数不是字符串则转换为query-string  */
+  let _params = typeof params === 'string' ? params : Qs.stringify(params)
+  /** 创建Image对象来发送请求  */
+  let img = new Image(1, 1)
+  let src = `${apiUrl}?${_params}`
+  img.src = src
+  /** 其实并不需要将此图片append到body中，请求此时已经发送，目的已经达成了  */
+  /** 利用load和error事件来监听动作的完成，返回Promise便于操作  */
+  return new Promise((resolve, reject) => {
+    img.onload = function () {
+      resolve({ code: 200, data: 'success!' })
+    }
+    img.onerror = function (e) {
+      reject(new Error(e.error))
+    }
+  })
+}
+
+//2 路由监听中记录pv uv
+
+router.afterEach((to, from) => {
+    const path = to.path
+    /* 如果开启了登录验证权限 */
+    if(process.env.AUTH_ENABLED) {
+        /* 除了登录页面，其他路由页面都请求记录*/
+        if(path !== '/login') {
+            pathBeaconAction(path)
+        }
+    }
+})
+
+// 3 vue中实现埋点 自定义指令  https://lhammer.cn/v-track/#/ 库
+
+/**
+ * <!-- 页面行为埋点（track-view为v-track全局注册的组件） -->
+<track-view v-track:18015></track-view>
+<track-view v-track:18015.watch="{ rest }"></track-view>
+<track-view v-track:18015.watch.delay="{ rest }"></track-view>
+<track-view v-if="rest" v-track:18015></track-view>
+ 
+<!-- 事件行为埋点（DOM） -->
+<div v-track:18015.click="handleClick"></div>
+<div v-track:18015.click="{ handleClick, item, index }"></div>
+<div v-track:18015.click.async="{ handleSearch, rest }"></div>
+<div v-track:18015.click.delay="handleClick"></div>
+ 
+<!-- 事件行为埋点（组件） -->
+<cmp v-track:18015.click="handleClick"></cmp>
+<cmp v-track:18015.[自定义事件名]="handleSearch"></cmp>
+<cmp v-track:18015.[自定义事件名].delay="handleSearch"></cmp>
+<cmp v-track:18015.[自定义事件名].async="{ handleSearch, rest }"></cmp>
+ 
+<!-- 区域展现埋点（block 可以是 DOM 或者组件） -->
+<block v-track:18015.show></block>
+<block v-track:18015.show.once></block>
+<block v-track:18015.show.custom="{ ref: 'scroll' }"></block>
+<block v-track:18015.show.custom.once="{ ref: 'scroll' }"></block>
+
+修饰符说明：
+
+.click 表示事件行为的埋点
+.[custom-event] 表示自定义事件行为的埋点
+.native 表示监听组件原生click事件行为的埋点
+.watch 表示页面异步行为的埋点
+.async 配合.click指令，表示异步事件行为的埋点
+.delay 表示埋点是否延迟执行，默认先执行埋点再执行回调
+.show 表示区域曝光埋点
+.once 配合.show指令，只执行一次埋点
+.custom 配合.show指令，表示使用自定义scroll事件
+
+*/
+</script>
+</html>

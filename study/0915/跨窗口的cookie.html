@@ -1,0 +1,66 @@
+<!--
+ * @Author       : zhaixiaowei@xdf.cn
+ * @Date         : 2022-09-15 16:46:24
+ * @LastEditors  : zhaixiaowei@xdf.cn
+ * @LastEditTime : 2022-09-15 16:58:02
+ * @Description  : 描述信息
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<!-- 1.html 内容 -->
+ 
+<!-- http://127.0.0.1:8000/1.html -->
+ 
+
+<body>
+  <a href="https://juejin.cn/post/7127916577684471845"></a>
+      我是 1.html, 下面嵌套 2.html
+       <iframe src="http://127.0.0.1:8000/2.html"></iframe>
+       
+  <script>
+    if (!document.cookie) {
+      document.cookie = 'name=1';
+      document.cookie = 'old=10';
+    }
+
+    console.log('1.html', document.cookie)
+  </script>
+   
+</body>
+ 
+ 
+ 
+<!-- 2.html 内容 -->
+ 
+<!-- http://127.0.0.1:8000/2.html -->
+ 
+
+<body>
+      我是 2.html
+       
+       
+  <script>
+    document.cookie = 'name=2';
+    document.cookie = 'year=2020';
+
+    console.log('2.html', document.cookie)
+  </script>
+   
+</body>
+
+第一次渲染输出：1.html name=1; old=10 ，2.html old=10; name=2; year=2020
+刷新页面输出：1.html old=10; year=2020; name=2 ， 2.html old=10; year=2020; name=2
+
+我们可以得出以下结论：
+iframe 嵌套的 2.html 设置的 cookie 我们可以从 1.html 中获取
+iframe 中设置的 cookie 会覆盖 1.html cookie 中 Name 相同的值( 不同源也是同样的效果 )
+
+</html>

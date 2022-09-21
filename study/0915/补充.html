@@ -1,0 +1,31 @@
+<!--
+ * @Author       : zhaixiaowei@xdf.cn
+ * @Date         : 2022-09-15 16:55:41
+ * @LastEditors  : zhaixiaowei@xdf.cn
+ * @LastEditTime : 2022-09-15 16:55:42
+ * @Description  : 描述信息
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <a href="https://juejin.cn/post/7127916577684471845"></a>
+    1. 同域才能访问父/祖父/祖先... 页面的方法
+    当 1.html 和 2.html 跨域，
+    1.html 和 3.html不跨域时，
+    3.html 可以通过 window.parent.parent.fn() 访问 1.html 的方法。
+
+    2。 跨域也能获取并覆盖父/祖父/祖先... 页面的cookie
+    iframe 嵌套，每层都互相跨域的页面，最内层的依然可以访问最外层的 cookie
+
+    提醒： 之前对 cookie 认识不够全面, cookie 也受 domain 的影响。如果cookie 的 domain不一致则不能互相访问、修改；（设置domain解决跨域的原理
+</body>
+
+</html>

@@ -1,0 +1,49 @@
+<!--
+ * @Author       : zhaixiaowei@xdf.cn
+ * @Date         : 2022-07-04 10:54:31
+ * @LastEditors  : zhaixiaowei@xdf.cn
+ * @LastEditTime : 2022-07-04 11:26:19
+ * @Description  : 描述信息
+-->
+
+<!-- 
+    QS1：
+    display:none 跟 visibility: hidden 的 区别
+    是否占据空间  二者都会被构建进dom树 但是none不会出现在渲染树中。前者渲染在前面。  
+    是否渲染 none-触发回流/重新渲染 hidden-只触发重绘 不进行渲染
+    是否是继承属性 display不是继承属性，元素及其子元素都会消失 visibility是继承属性，若子元素使用了visibility:visible，则不继承，这个子孙元素又会显现出来。
+-->
+
+<!-- 
+    QS2: div里面放img，div设置display:none 和 visibility:hidden对img的src加载有什么影响？
+    - display: none 
+        自身背景与后代img元素能够请求，后代元素的背景图无法请求，所以的这些图片都不会被渲染
+    - visibility: hidden
+        自身背景与后代img元素，后代背景的元素都可以被请求，而且后代可以被展示出来 
+        因为visibility是继承元素
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .outer {
+        width: 100px;
+        height: 100px;
+        /* display: none; */
+        visibility: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer">
+      <img
+        src="https://upload-images.jianshu.io/upload_images/5809200-a99419bb94924e6d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240"
+        alt=""
+      />
+    </div>
+  </body>
+</html>

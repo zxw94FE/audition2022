@@ -1,0 +1,56 @@
+<!--
+ * @Author       : zhaixiaowei@xdf.cn
+ * @Date         : 2022-03-21 10:28:15
+ * @LastEditors  : zhaixiaowei@xdf.cn
+ * @LastEditTime : 2022-03-21 10:54:48
+ * @Description  : 利用contains实现关闭弹窗
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .outter {
+            width: 100px;
+            height: 100px;
+            background-color: red;
+        }
+        .inner {
+            width: 50px;
+            height: 50px;
+            background-color: greenyellow;
+        }
+        .close {
+            width: 50px;
+            height: 50px;
+            background-color: blue;
+        }
+    </style>
+</head>
+<body>
+    <div class="outter">
+        <div class='inner'>题目区域2</div>
+        <div class='close'>关闭按钮2</div>
+    </div>
+    <script>
+        document.addEventListener(
+            'click', (event) => {
+                console.log(event.target) // event.target找到的是最深层的dom
+                const outter = document.querySelector('.outter')
+                const inner = document.querySelector('.inner')
+                const close = document.querySelector('.close') // 如果close包含在outter中。
+                const eventDom = event.target
+                // TODO     close.contains(eventDom) 说明点击到了关闭按钮上
+                // TODO     !outter.contains(eventDom) 说明没有点击到outter上，点击到了外部的区域上。
+                // TODO     如果题目区域只占据了outter的一部分区域，并没有占据全部，那么还需要加上
+                if(close.contains(eventDom) || !outter.contains(eventDom) || (outter.contains(eventDom) && eventDom !== inner)) {
+                    console.log('收起弹窗')
+                }
+            }
+        )
+    </script>
+</body>
+</html>

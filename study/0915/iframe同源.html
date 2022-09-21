@@ -1,0 +1,80 @@
+<!--
+ * @Author       : zhaixiaowei@xdf.cn
+ * @Date         : 2022-09-15 16:18:05
+ * @LastEditors  : zhaixiaowei@xdf.cn
+ * @LastEditTime : 2022-09-15 16:30:13
+ * @Description  : 描述信息
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<a href="https://juejin.cn/post/7127916577684471845"></a>
+<!-- 1.html 内容 -->
+ 
+<!-- http://127.0.0.1:8000/1.html -->
+ 
+
+<body>
+      我是 1.html, 下面嵌套 2.html
+       <iframe src="http://127.0.0.1:8000/2.html"></iframe>
+       
+  <script>
+    function hello () { console.log('this is 1.html') }
+
+    var iframe = document.getElementsByTagName('iframe')[0];
+    console.log('contentWindow 🥝', iframe.contentWindow); // 能访问
+    console.log('contentDocument 🥝', iframe.contentDocument); // 能访问
+
+    // 注意访问方式, 需要在 onload 后才能取到值
+    console.log(iframe.contentWindow.hello()) // Uncaught TypeError: iframe.contentWindow.hello is not a function
+
+    iframe.onload = function () {
+      console.log(iframe.contentWindow.hello()) // this is 2.html
+
+      //  输出 Location 对象， 依然要在 iframe.onload 中访问
+      console.log('contentWindow.location 🥝', iframe.contentWindow.location)
+      //  iframe.contentWindow.location.host : 127.0.0.1:8000
+      //  xxx.hash:     ""
+      //  xxx.host:     "127.0.0.1:8000"
+      //  xxx.hostname: "127.0.0.1"
+      //  xxx.href:     "http://127.0.0.1:8000/2.html"
+      //  xxx.origin:   "http://127.0.0.1:8000"
+      //  xxx.pathname: "/2.html"
+      //  xxx.port:     "8000"    
+      //  xxx.protocol: "http:"
+      //  ...
+
+      // 有相同的源 我们可以进行任何操作
+      iframe.contentDocument.body.innerHTML('<p>hi, i am ur father !</p>');
+      iframe.contentDocument.getElementsByTagName('p');
+    })
+
+    iframe.contentWindow.location = 'http://www.360doc.com'; // 可以直接修改 iframe 地址, 不受同源策略的限制。 有的网站不支持被iframe引用, 所以会报错。 注意区分错误信息。
+  </script>
+   
+</body>
+
+
+ 
+<!-- 2.html 内容 -->
+ 
+<!-- http://127.0.0.1:8000/2.html -->
+ 
+
+<body>
+      我是 2.html
+       
+       
+  <script>
+    function hello () { console.log('this is 2.html') }
+  </script>
+   
+</body>
+
+</html>

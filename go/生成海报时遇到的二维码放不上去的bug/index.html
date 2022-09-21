@@ -1,0 +1,68 @@
+<!--
+ * @Author       : zhaixiaowei@xdf.cn
+ * @Date         : 2022-09-14 17:30:57
+ * @LastEditors  : zhaixiaowei@xdf.cn
+ * @LastEditTime : 2022-09-14 17:47:30
+ * @Description  : 描述信息
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>生成poster(伪代码)</title>
+</head>
+<body>
+    <div id="box">
+        <img src="posterInfo.avatarUrl" alt="">
+        <img src="posterInfo.shareUrl" alt="">
+    </div>
+    <div>生成海报</div>
+</body>
+<script>
+    // 伪代码
+    import { imgUrl2Base64 } from './index.js'
+
+    getBase64 = () => {
+        getWordPoster(obj).then((res) => {
+        // 三张跨域图片统一做base64处理 目前版本没做
+        const posterInfo = res
+        Promise.all([
+            imgUrl2Base64(posterInfo.avatarUrl),
+            imgUrl2Base64(posterInfo.shareUrl)
+        ]).then(([avatarBase64, shareBase64]) => {
+            posterInfo.avatarUrl = avatarBase64
+            posterInfo.shareUrl = shareBase64
+            this.setState({posterInfo})
+        })
+    });
+    }
+    
+
+    import html2canvas from 'xdf-html2canvas'
+    const generate = () => {
+        scrollTo(0, 0)
+        const _this = this
+        const container = document.querySelector('#box')
+        html2canvas(container, {
+            useCORS: true,
+            // allowTaint: true,  //不能与useCORS同时使用
+            backgroundColor: null,
+            // 设置canvas尺寸与所截图尺寸相同，防止白边
+            width: container.offsetWidth,
+            height: container.offsetHeight - 2,
+            x: 0,
+            y: 0
+        }).then(function (canvas) {
+            const a = canvas.toDataURL('image/png')
+            _this.setState({
+                canvasSrc: a,
+                showBtn: true
+            })
+        })
+    }
+
+    // canvasSrc 就是最终生成的二维码。
+</script>
+</html>

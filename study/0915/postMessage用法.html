@@ -1,0 +1,52 @@
+<!--
+ * @Author       : zhaixiaowei@xdf.cn
+ * @Date         : 2022-09-15 16:34:49
+ * @LastEditors  : zhaixiaowei@xdf.cn
+ * @LastEditTime : 2022-09-15 16:45:50
+ * @Description  : 描述信息
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    1. postMessage.
+    想要发送信息的窗口需要调用接收窗口的postMessage方法，换句话说，如果我们想把消息发送给win，我们应该调用win.postMessage(data, targetOrigin)
+    参数
+    1. data 要发送的数据，可以是任何对象。数据会被通过使用“结构化序列化算法”进行克隆。但“IE”只支持字符串，因此我们需要对负责的对象执行JSON.stringify方法进行处理，以支持该浏览器。
+    2. targetOrigin 指定目标窗口的源，以便只有来自给定的源的窗口才能获得该消息。
+    2. onMessage
+    为了接收消息，目标窗口应该在message事件上有一个处理程序，当postMessage被调用时触发该事件，并且targetOrigin检查成功。
+    event对象具有特殊属性。
+    1. data 从postMessage传递过来的数据
+    2. origin 发送方的源，
+    3. source 对发送方窗口的引用，如果我们想 可以立即 event.source.postMessage()回去
+    要为message事件分配处理程序，我们使用 addEventListener 不能使用 window.onmessage
+
+    <script>
+        window.addEventListener("message", function (event) {
+            console.log(event)
+            if (event.origin != 'http://http://127.0.0.1:8080') {
+                // 来自未知的源的内容，我们忽略它
+                return;
+            }
+            if (window == event.source) {
+                // chrome 下, 页面初次加载后会触发一次 message 事件, event.source 是 window 对象
+                // 此时 event.source.postMessage 会形成死循环
+                // 因此，要跳过第一次的初始化触发的情况
+                return
+            }
+            console.log("received: " + event.data);
+            // 可以使用 event.source.postMessage(...) 向回发送消息
+            event.source.postMessage('i am 2.html')
+        }, source);
+    </script>
+</body>
+
+</html>

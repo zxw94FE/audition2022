@@ -1,0 +1,30 @@
+/*
+ * @Author       : zhaixiaowei@xdf.cn
+ * @Date         : 2022-08-01 15:02:46
+ * @LastEditors  : zhaixiaowei@xdf.cn
+ * @LastEditTime : 2022-08-01 15:02:47
+ * @Description  : 描述信息
+ */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    1. position: fixed 默认情况下 相对于浏览器窗口进行定位，不论窗口滚动与否 都会留在此处。
+        - 但是当祖先元素具有transform属性且不为none时，就会相对于祖先元素进行定位。
+    2. relative 相对定位 相对于该元素在文档中的初始位置进行定位 通过left right bottom top 设置 此元素相对于自身位置的偏移
+    3. absolute 绝对定位 相对于距离自己最近的已定位的祖先元素 进行定位。
+        - 如果没有一个祖先元素设置定位 参照物为body
+        - 绝对定位相对于包含块的起始位置：
+            - 如果包含块是块级元素 包含块则设置为该元素的内边距边界
+            - 如果包含块是行内元素 包含块则设置为该元素的内容边界
+
+    浮动 绝对 固定定位 会脱离文档流 
+    相对定位不会脱离文档流
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!--
+ * @Author       : zhaixiaowei@xdf.cn
+ * @Date         : 2022-09-15 16:26:10
+ * @LastEditors  : zhaixiaowei@xdf.cn
+ * @LastEditTime : 2022-09-15 16:26:59
+ * @Description  : 描述信息
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<a href="https://juejin.cn/post/7127916577684471845"></a>
+<!-- 1.html 内容 -->
+ 
+<!-- http://127.0.0.1:8000/1.html -->
+ 
+
+<body>
+      我是 1.html, 下面嵌套 2.html
+       
+  <!-- 端口不同, 不同源 -->
+       <iframe src="http://127.0.0.1:8001/2.html"></iframe>
+       
+  <script>
+    function hello () { console.log('this is 1.html') }
+
+    var iframe = document.getElementsByTagName('iframe')[0];
+    console.log('contentWindow 🥝', iframe.contentWindow); // 可以获取对内部 window 的引用
+    console.log('contentDocument 🥝', iframe.contentDocument); // 空的 document 对象
+
+    iframe.onload = function () {
+      console.log(iframe.contentWindow.hello()) // Uncaught DOMException: Blocked a frame with origin "http://127.0.0.1:8000" from accessing a cross-origin frame.
+
+
+      // 无法读取 iframe 中页面的 URL
+      console.log(iframe.contentWindow.location)
+      // Location {then: undefined, Symbol(Symbol.toStringTag): undefined, Symbol(Symbol.hasInstance): undefined, Symbol(Symbol.isConcatSpreadable): undefined, replace: ƒ}
+
+
+      console.log(iframe.contentWindow.location.href) // Uncaught DOMException: Blocked a frame with origin "http://127.0.0.1:8000" from accessing a cross-origin frame. 
+    })
+
+
+    iframe.contentWindow.location = 'http://www.360doc.com'; // 可以直接修改 iframe 地址, 不受同源策略的限制，不受同源策略的限制，不受同源策略的限制。 
+  </script>
+   
+</body>
+ 
+ 
+ 
+<!-- 2.html 内容 -->
+ 
+<!-- http://127.0.0.1:8001/2.html -->
+ 
+
+<body>
+      我是 2.html
+       
+       
+  <script>
+    function hello () { console.log('this is 2.html') }
+  </script>
+   
+</body>
+
+</html>

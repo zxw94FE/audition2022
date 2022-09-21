@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body onbeforeunload="history.go(0)">
+<button id="gogogo">
+    forward
+</button>
+
+<p id="clickToBaidu">点击去百度</p>
+<script>
+    window.history.forward()
+</script>
+<script>
+    // document.getElementById('gogogo').addEventListener('click', () => {
+    //     window.open('https://www.baidu.com', "_parent")
+    // })
+    const createA = (url, id) => {
+        let a = document.createElement('a')
+        a.setAttribute('href', url)
+        a.setAttribute('target', '_self')
+        a.setAttribute('id', id)
+        if(!document.getElementById(id)) {
+            document.body.appendChild(a)
+        }
+        a.click()
+    }
+
+    // 这种方式是可以的，因为是在回调当中执行的createA. 而不是直接执行的
+    // document.getElementById('clickToBaidu').addEventListener('click', () => {
+    //     createA('https://www.baidu.com', 'aaa')
+    // })
+
+
+    // 这种情况页面无需click 页面会直接执行createA,click事件失效
+    // document.getElementById('clickToBaidu').addEventListener('click', createA('https://www.baidu.com', 'aaa'))
+
+    // 也可以采用bind这种方式，因为bind不直接执行，区别于apply跟call
+    document.getElementById('clickToBaidu').addEventListener('click', createA.bind(window, 'https://www.baidu.com', 'aaa'))
+    /*
+    * TODO 1. 在body的onbeforeunload 里面添加 history.go(0) 实现：不希望某个网页通过浏览器的前进后退按钮来后退或前进，可以通过简单的办法达到该效果
+    * TODO 2. <script>window.history.forward()<script/> 这种方法是用于防止由下一个页面返回的。简单的说，页面A（A中有这段代码）转向页面B，这时，B向A转向是被禁止。
+    * */
+
+</script>
+</body>
+</html>
